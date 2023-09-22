@@ -63,7 +63,7 @@ function AbstractBayesianOptimization.initialize!(dsm::BasicGP, oh::Optimization
     init_xs = [next!(dsm.initializer) for _ in 1:(dsm.n_init)]
     init_ys = evaluate_objective!(oh, init_xs)
     # update of observed maximum & maximizer is done automatically by OptimizationHelper
-    add_point!(dsm.surrogate, init_xs, init_ys)
+    add_points!(dsm.surrogate, init_xs, init_ys)
     update_hyperparameters!(dsm.surrogate, BoundedHyperparameters(dsm.θ_initial))
     return nothing
 end
@@ -71,7 +71,7 @@ end
 function AbstractBayesianOptimization.update!(dsm::BasicGP, oh::OptimizationHelper, xs, ys)
     dsm.verbose || @info @sprintf "#eval %3i: update! run" evaluation_counter(oh)
     @assert length(xs) == length(ys)
-    add_point!(dsm.surrogate, xs, ys)
+    add_points!(dsm.surrogate, xs, ys)
     if evaluation_counter(oh) % dsm.optimize_θ_every == 0
         update_hyperparameters!(dsm.surrogate, BoundedHyperparameters(dsm.θ_initial))
         dsm.verbose ||

@@ -12,7 +12,7 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::MaxMeanPolicy,
     dsm::BasicGP,
     oh::OptimizationHelper)
     # optimize posterior mean
-    objective = x -> mean(dsm.surrogate, x)
+    objective = x -> mean_at_point(dsm.surrogate, x)
     maximizer, maximum = maximize_acquisition(objective,
         dimension(oh),
         ac_policy.optimizer_options)

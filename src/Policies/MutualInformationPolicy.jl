@@ -33,11 +33,11 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::MutualInformationPo
     if iszero(evaluation_counter(oh))
         ac_policy.γ̂ = 0.0
     else
-        ac_policy.γ̂ += var(dsm.surrogate, norm_last_x(oh))
+        ac_policy.γ̂ += var_at_point(dsm.surrogate, norm_last_x(oh))
     end
     objective = x -> begin
         # possibly faster implementation when computing both at once
-        μ, σ² = mean_and_var(dsm.surrogate, x)
+        μ, σ² = mean_and_var_at_point(dsm.surrogate, x)
         return MutualInformation(μ, σ², ac_policy.sqrt_α, ac_policy.γ̂)
     end
     maximizer, maximum = maximize_acquisition(objective,

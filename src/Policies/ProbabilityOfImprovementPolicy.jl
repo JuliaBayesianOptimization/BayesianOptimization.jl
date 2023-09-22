@@ -10,7 +10,7 @@ are mean and standard deviation of the distribution at point `x`.
 """
 function ProbabilityOfImprovement(μ, σ², τ = -Inf)
     σ² == 0 && return float(μ > τ)
-    return normal_cdf(μ - τ, σ²)
+    return normal_cdf(μ - τ, sqrt(σ²))
 end
 
 struct ProbabilityOfImprovementPolicy <: AbstractPolicy
@@ -33,10 +33,7 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::ProbabilityOfImprov
     # by E.Brochu, V.M.Cora, N. Freitas
     objective = x -> begin
         # possibly faster implementation when computing both at once
-        println("hello")
-        μ = mean(dsm.surrogate, x)
-        σ² = var(dsm.surrogate, x)
-        println("mu, sigma")
+        μ, σ² = mean_and_var_at_point(dsm.surrogate, x)
         return ProbabilityOfImprovement(μ, σ², norm_observed_maximum(oh))
     end
 
