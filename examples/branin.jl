@@ -68,10 +68,12 @@ dsm = BasicGP(oh, 10; optimize_θ_every = 10)
 #policy = ExpectedImprovementPolicy()
 # policy = MaxMeanPolicy()
 # policy = MutualInformationPolicy()
-policy = ProbabilityOfImprovementPolicy()
-# policy = ThompsonSamplingPolicy(oh)
-# policy = UpperConfidenceBoundPolicy()
 
+# PI does not work that well, is it correct??
+policy = ProbabilityOfImprovementPolicy()
+
+#policy = ThompsonSamplingPolicy(oh)
+# policy = UpperConfidenceBoundPolicy()
 
 # run initial sampling, create initial trust regions and local models
 initialize!(dsm, oh)

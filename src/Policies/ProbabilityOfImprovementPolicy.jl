@@ -31,15 +31,10 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::ProbabilityOfImprov
     # see P.11 of A tutorial on bayesian optimizationof expensive const functions,
     # with application to active user modeling and hierarchical reinforcement learning,
     # by E.Brochu, V.M.Cora, N. Freitas
-    objective = x -> begin
+    maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
         # possibly faster implementation when computing both at once
         μ, σ² = mean_and_var_at_point(dsm.surrogate, x)
         return ProbabilityOfImprovement(μ, σ², norm_observed_maximum(oh))
-    end
-
-    maximizer, maximum = maximize_acquisition(objective,
-        dimension(oh),
-        ac_policy.optimizer_options)
-    # TODO: log maximum ?
+    end)
     return [maximizer]
 end

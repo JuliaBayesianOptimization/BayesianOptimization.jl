@@ -26,14 +26,11 @@ end
 function AbstractBayesianOptimization.next_batch!(ac_policy::ExpectedImprovementPolicy,
     dsm::BasicGP,
     oh::OptimizationHelper)
-    objective = x -> begin
+    maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
         # possibly faster implementation when computing both at once
         μ, σ² = mean_and_var_at_point(dsm.surrogate, x)
-        return ExpectedImprovement(μ, σ², norm_observed_maximum(oh))
-    end
-    maximizer, maximum = maximize_acquisition(objective,
-        dimension(oh),
-        ac_policy.optimizer_options)
-    # TODO: log maximum ?
+        ExpectedImprovement(μ, σ², norm_observed_maximum(oh))
+    end)
+
     return [maximizer]
 end

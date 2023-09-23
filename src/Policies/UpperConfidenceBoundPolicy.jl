@@ -74,15 +74,10 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::UpperConfidenceBoun
     nobs = evaluation_counter(oh)
     nobs == 0 && (nobs = 1)
     βt = sqrt(2 * log(nobs^(dimension(oh) / 2 + 2) * π^2 / (3 * ac_policy.scaling.δ)))
-
-    objective = x -> begin
+    maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
         # possibly faster implementation when computing both at once
         μ, σ² = mean_and_var_at_point(dsm.surrogate, x)
         return UpperConfidenceBound(μ, σ², βt)
-    end
-    maximizer, maximum = maximize_acquisition(objective,
-        dimension(oh),
-        ac_policy.optimizer_options)
-    # TODO: log maximum ?
+    end)
     return [maximizer]
 end

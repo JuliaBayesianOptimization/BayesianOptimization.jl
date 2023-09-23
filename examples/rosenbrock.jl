@@ -47,17 +47,15 @@ function p()
 end
 
 # g, sense::Sense, lb, ub, max_evaluations
-oh = OptimizationHelper(rosenbrock, Min, lb, ub, 300)
+oh = OptimizationHelper(rosenbrock, Min, lb, ub, 200)
 # oh, n_init; optimize_θ_every = 10, ...
-dsm = BasicGP(oh, 10,optimize_θ_every=  10)
+dsm = BasicGP(oh, 10, optimize_θ_every = 10)
 #policy = ExpectedImprovementPolicy()
-# policy = MaxMeanPolicy()
+#policy = MaxMeanPolicy()
 # policy = MutualInformationPolicy()
-policy = ProbabilityOfImprovementPolicy()
-# policy = ThompsonSamplingPolicy(oh)
+# policy = ProbabilityOfImprovementPolicy()
+#policy = ThompsonSamplingPolicy(oh)
 # policy = UpperConfidenceBoundPolicy()
-
-
 
 # run initial sampling, create initial trust regions and local models
 initialize!(dsm, oh)
