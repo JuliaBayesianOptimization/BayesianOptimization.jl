@@ -24,8 +24,8 @@ function ProbabilityOfImprovementPolicy(; optimizer_options = (;))
 end
 
 function AbstractBayesianOptimization.next_batch!(ac_policy::ProbabilityOfImprovementPolicy,
-    dsm::BasicGP,
-    oh::OptimizationHelper)
+    dsm,
+    oh)
     # τ is set to the observed maximum sofar
     # TODO: add ξ > 0 (with a decreasing schedule to 0) to τ to drive more exploration,
     # see P.11 of A tutorial on bayesian optimizationof expensive const functions,
@@ -33,7 +33,7 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::ProbabilityOfImprov
     # by E.Brochu, V.M.Cora, N. Freitas
     maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
         # possibly faster implementation when computing both at once
-        μ, σ² = mean_and_var_at_point(dsm.surrogate, x)
+        μ, σ² = mean_and_var_at_point(dsm, x)
         return ProbabilityOfImprovement(μ, σ², norm_observed_maximum(oh))
     end)
     return [maximizer]

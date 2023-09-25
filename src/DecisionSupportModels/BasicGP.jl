@@ -25,7 +25,7 @@ struct BasicGP{D <: Real, R <: Real, J} <: AbstractDecisionSupportModel
     verbose::Bool
 end
 
-function BasicGP(oh::OptimizationHelper,
+function BasicGP(oh,
     n_init;
     optimize_θ_every = 10,
     kernel_creator = kernel_creator,
@@ -52,7 +52,7 @@ function BasicGP(oh::OptimizationHelper,
         verbose)
 end
 
-function AbstractBayesianOptimization.initialize!(dsm::BasicGP, oh::OptimizationHelper)
+function AbstractBayesianOptimization.initialize!(dsm::BasicGP, oh)
     # check if there is budget before evaluating the objective
     if evaluation_budget(oh) < dsm.n_init
         dsm.state.isdone = true
@@ -68,7 +68,7 @@ function AbstractBayesianOptimization.initialize!(dsm::BasicGP, oh::Optimization
     return nothing
 end
 
-function AbstractBayesianOptimization.update!(dsm::BasicGP, oh::OptimizationHelper, xs, ys)
+function AbstractBayesianOptimization.update!(dsm::BasicGP, oh, xs, ys)
     dsm.verbose || @info @sprintf "#eval %3i: update! run" evaluation_counter(oh)
     @assert length(xs) == length(ys)
     add_points!(dsm.surrogate, xs, ys)
@@ -82,3 +82,11 @@ function AbstractBayesianOptimization.update!(dsm::BasicGP, oh::OptimizationHelp
 end
 
 AbstractBayesianOptimization.isdone(dsm::BasicGP) = dsm.state.isdone
+
+# forwarding pattern for SurrogatesBase interface used in policies
+function SurrogatesBase.mean_and_var_at_point(dsm::BasicGP, x)
+    return mean_and_var_at_point(dsm.surrogate, x)
+end
+SurrogatesBase.mean_at_point(dsm::BasicGP, x) = mean_at_point(dsm.surrogate, x)
+SurrogatesBase.var_at_point(dsm::BasicGP, x) = var_at_point(dsm.surrogate, x)
+SurrogatesBase.rand(dsm::BasicGP, xs) = rand(dsm.surrogate, xs)

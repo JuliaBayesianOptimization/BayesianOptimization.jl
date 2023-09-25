@@ -24,11 +24,11 @@ function ExpectedImprovementPolicy(; optimizer_options = (;))
 end
 
 function AbstractBayesianOptimization.next_batch!(ac_policy::ExpectedImprovementPolicy,
-    dsm::BasicGP,
-    oh::OptimizationHelper)
+    dsm,
+    oh)
     maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
         # possibly faster implementation when computing both at once
-        μ, σ² = mean_and_var_at_point(dsm.surrogate, x)
+        μ, σ² = mean_and_var_at_point(dsm, x)
         ExpectedImprovement(μ, σ², norm_observed_maximum(oh))
     end)
 

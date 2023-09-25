@@ -9,11 +9,11 @@ function MaxMeanPolicy(; optimizer_options = (;))
 end
 
 function AbstractBayesianOptimization.next_batch!(ac_policy::MaxMeanPolicy,
-    dsm::BasicGP,
+    dsm,
     oh::OptimizationHelper)
     # optimize posterior mean
     maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
-        mean_at_point(dsm.surrogate, x)
+        mean_at_point(dsm, x)
     end)
     return [maximizer]
 end
