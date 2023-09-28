@@ -38,9 +38,9 @@ end
 function minima(::typeof(branin))
     [[-π - Δ, 12.275 - Δ], [π - Δ, 2.275 - Δ], [9.42478 - Δ, 2.475 - Δ]], 0.397887
 end
-mins, fmin = minima(branin)
+b_mins, b_fmin = minima(branin)
 
-function p()
+function p(mins)
     plt = contour(-15:0.1:15,
         -15:0.1:15,
         (x, y) -> -branin([x, y]),
@@ -62,7 +62,7 @@ function p()
 end
 
 # g, sense::Sense, lb, ub, max_evaluations
-oh = OptimizationHelper(branin, Min, lb, ub, 200)
+oh = OptimizationHelper(branin, Min, lb, ub, 100)
 # oh, n_init; optimize_θ_every = 10, ...
 dsm = BasicGP(oh, 10; optimize_θ_every = 10)
 policy = ExpectedImprovementPolicy()
@@ -73,7 +73,7 @@ policy = ExpectedImprovementPolicy()
 #policy = ProbabilityOfImprovementPolicy()
 
 #policy = ThompsonSamplingPolicy(oh)
-# policy = UpperConfidenceBoundPolicy()
+#policy = UpperConfidenceBoundPolicy()
 
 # run initial sampling, create initial trust regions and local models
 initialize!(dsm, oh)
@@ -85,7 +85,7 @@ initialize!(dsm, oh)
 optimize!(dsm, policy, oh)
 
 # savefig(p(), "plot_after_optimization.png")
-display(p())
+display(p(b_mins))
 
-observed_dist = minimum((m -> norm(solution(oh)[1] .- m)).(mins))
-observed_regret = abs(solution(oh)[2] - fmin)
+observed_dist = minimum((m -> norm(solution(oh)[1] .- m)).(b_mins))
+observed_regret = abs(solution(oh)[2] - b_fmin)

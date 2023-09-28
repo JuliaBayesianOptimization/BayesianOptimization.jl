@@ -23,9 +23,9 @@ rosenbrock(x::Vector; kwargs...) = rosenbrock(x[1], x[2]; kwargs...)
 rosenbrock(x1, x2) = 100 * (x2 - x1^2)^2 + (1 - x1)^2
 
 minima(::typeof(rosenbrock)) = [[1, 1]], 0
-mins, fmin = minima(rosenbrock)
+r_mins, r_fmin = minima(rosenbrock)
 
-function p()
+function p(r_mins)
     plt = contour(-2:0.1:2,
         -1:0.1:2,
         (x, y) -> -rosenbrock([x, y]),
@@ -34,8 +34,8 @@ function p()
     plt = scatter!((x -> x[1]).(history(oh)[1]),
         (x -> x[2]).(history(oh)[1]),
         label = "eval. hist")
-    plt = scatter!((x -> x[1]).(mins),
-        (y -> y[2]).(mins),
+    plt = scatter!((x -> x[1]).(r_mins),
+        (y -> y[2]).(r_mins),
         label = "true minima",
         markersize = 10,
         shape = :diamond)
@@ -55,7 +55,7 @@ dsm = BasicGP(oh, 10, optimize_θ_every = 10)
 # policy = MutualInformationPolicy()
 # policy = ProbabilityOfImprovementPolicy()
 #policy = ThompsonSamplingPolicy(oh)
-# policy = UpperConfidenceBoundPolicy()
+policy = UpperConfidenceBoundPolicy()
 
 # run initial sampling, create initial trust regions and local models
 initialize!(dsm, oh)
@@ -67,7 +67,7 @@ initialize!(dsm, oh)
 optimize!(dsm, policy, oh)
 
 # savefig(p(), "plot_after_optimization.png")
-display(p())
+display(p(r_mins))
 
-observed_dist = minimum((m -> norm(solution(oh)[1] .- m)).(mins))
-observed_regret = abs(solution(oh)[2] - fmin)
+observed_dist = minimum((m -> norm(solution(oh)[1] .- m)).(r_mins))
+observed_regret = abs(solution(oh)[2] - r_fmin)
