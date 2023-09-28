@@ -11,6 +11,7 @@ using SurrogatesBase
 using Printf
 using ParameterHandling
 # TODO: remove sobol -> keep quasimontecarlo.jl only
+# but does QuasiMonteCarlo support next!(..) interface???
 using Sobol
 using QuasiMonteCarlo
 using KernelFunctions
