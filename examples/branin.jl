@@ -65,12 +65,12 @@ end
 oh = OptimizationHelper(branin, Min, lb, ub, 200)
 # oh, n_init; optimize_θ_every = 10, ...
 dsm = BasicGP(oh, 10; optimize_θ_every = 10)
-#policy = ExpectedImprovementPolicy()
+policy = ExpectedImprovementPolicy()
 # policy = MaxMeanPolicy()
 # policy = MutualInformationPolicy()
 
 # PI does not work that well, is it correct??
-policy = ProbabilityOfImprovementPolicy()
+#policy = ProbabilityOfImprovementPolicy()
 
 #policy = ThompsonSamplingPolicy(oh)
 # policy = UpperConfidenceBoundPolicy()

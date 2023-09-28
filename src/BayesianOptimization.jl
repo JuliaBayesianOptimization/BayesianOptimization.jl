@@ -6,6 +6,7 @@ module BayesianOptimization
 # add https://github.com/JuliaBayesianOptimization/AbstractBayesianOptimization.jl.git
 using AbstractBayesianOptimization
 using SurrogatesAbstractGPs
+using SurrogatesBase
 
 using Printf
 using ParameterHandling

@@ -28,8 +28,8 @@ end
 
 #  requires no_history falg in OptimizationHelper set to true
 function AbstractBayesianOptimization.next_batch!(ac_policy::MutualInformationPolicy,
-    dsm::BasicGP,
-    oh::OptimizationHelper)
+    dsm,
+    oh)
     if iszero(evaluation_counter(oh))
         ac_policy.γ̂ = 0.0
     else
