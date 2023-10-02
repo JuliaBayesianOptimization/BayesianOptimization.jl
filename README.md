@@ -5,4 +5,7 @@
 *This repo contains experimental code at the moment.*
 
 This package provides traditional Bayesian optimization algorithms, in a modular format.
-It refactors and extends registered package [BayesianOptimization.jl](https://github.com/jbrea/BayesianOptimization.jl).
+
+## Credits
+
+This package refactors the registered package `BayesianOptimization.jl` available at [https://github.com/jbrea/BayesianOptimization.jl](https://github.com/jbrea/BayesianOptimization.jl). In particular, many code snippets were adopted verbatim.
