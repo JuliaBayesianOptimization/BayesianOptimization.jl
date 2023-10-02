@@ -1,4 +1,4 @@
-# BayesianOptimization
+# BayesianOptimization.jl
 
 [![Build Status](https://github.com/samuelbelko/BayesianOptimization.jl/actions/workflows/CI.yml/badge.svg?branch=)](https://github.com/samuelbelko/BayesianOptimization.jl/actions/workflows/CI.yml?query=branch%3A)
 
