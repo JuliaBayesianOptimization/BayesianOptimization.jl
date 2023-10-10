@@ -84,6 +84,9 @@ initialize!(dsm, oh)
 # Optimize
 optimize!(dsm, policy, oh)
 
+# profile in VSCode Optimize
+# @profview optimize!(dsm, policy, oh)
+
 # savefig(p(), "plot_after_optimization.png")
 display(p(b_mins))
 
