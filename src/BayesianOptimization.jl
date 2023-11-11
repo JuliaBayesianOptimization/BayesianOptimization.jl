@@ -1,7 +1,7 @@
 module BayesianOptimization
 
 # -> need to manually add before (they have no versions):
-# add https://github.com/samuelbelko/SurrogatesBase.jl.git#param-abstract-type
+# add https://github.com/samuelbelko/SurrogatesBase.jl.git#finite_posterior
 # add https://github.com/JuliaBayesianOptimization/SurrogatesAbstractGPs.jl.git
 # add https://github.com/JuliaBayesianOptimization/AbstractBayesianOptimization.jl.git
 using AbstractBayesianOptimization
@@ -19,11 +19,12 @@ using Random
 using SpecialFunctions
 
 # decision support model
+export PreBasicGP
 export BasicGP
 include("DecisionSupportModels/BasicGP.jl")
 
 # helper utilities from AbstractBayesianOptimization
-export OptimizationHelper, Min, Max, initialize!, optimize!, history, solution
+export OptimizationHelper, Min, Max, initialize, optimize!, history, solution
 
 # miscellaneous
 include("Misc/defaults.jl")

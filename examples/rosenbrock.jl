@@ -2,9 +2,9 @@ using Pkg
 Pkg.activate("examples/")
 
 # add it by running `dev ../BayesianOptimization.jl/`
-# -> need to manually add before (they have no versions):
-# add https://github.com/samuelbelko/SurrogatesBase.jl.git#at_point
-# add https://github.com/JuliaBayesianOptimization/SurrogatesAbstractGPs.jl.git#at_point
+# -> need to manually add before (they have no versions): Note the branch names!
+# add https://github.com/samuelbelko/SurrogatesBase.jl.git#finite_posterior
+# add https://github.com/JuliaBayesianOptimization/SurrogatesAbstractGPs.jl.git
 # add https://github.com/JuliaBayesianOptimization/AbstractBayesianOptimization.jl.git
 using BayesianOptimization
 
@@ -49,16 +49,16 @@ end
 # g, sense::Sense, lb, ub, max_evaluations
 oh = OptimizationHelper(rosenbrock, Min, lb, ub, 200)
 # oh, n_init; optimize_θ_every = 10, ...
-dsm = BasicGP(oh, 10, optimize_θ_every = 10)
-#policy = ExpectedImprovementPolicy()
+pre_dsm = PreBasicGP(oh, 10, optimize_θ_every = 10)
+policy = ExpectedImprovementPolicy(optimizer_options = (restarts = 50,))
 #policy = MaxMeanPolicy()
 # policy = MutualInformationPolicy()
 # policy = ProbabilityOfImprovementPolicy()
 #policy = ThompsonSamplingPolicy(oh)
-policy = UpperConfidenceBoundPolicy()
+# policy = UpperConfidenceBoundPolicy()
 
 # run initial sampling, create initial trust regions and local models
-initialize!(dsm, oh)
+dsm = initialize(pre_dsm, oh)
 
 # savefig(p(), "plot_before_optimization.png")
 #display(p())

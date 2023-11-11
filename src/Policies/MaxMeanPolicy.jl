@@ -13,7 +13,7 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::MaxMeanPolicy,
     oh)
     # optimize posterior mean
     maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
-        mean_at_point(dsm, x)
+        only(mean(finite_posterior(dsm, [x])))
     end)
     return [maximizer]
 end

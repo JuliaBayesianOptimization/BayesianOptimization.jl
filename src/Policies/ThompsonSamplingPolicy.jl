@@ -26,6 +26,6 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::ThompsonSamplingPol
 
     # xs_vector = [xs_matrix[:, i] for i in 1:size(xs_matrix, 2)]
     xs_vector = [next!(ac_policy.sobol_generator) for _ in 1:(ac_policy.n_samples)]
-    ys = rand(dsm, xs_vector)
+    ys = rand(finite_posterior(dsm, xs_vector))
     return [xs_vector[argmax(ys)]]
 end

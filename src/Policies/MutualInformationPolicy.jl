@@ -33,11 +33,11 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::MutualInformationPo
     if iszero(evaluation_counter(oh))
         ac_policy.γ̂ = 0.0
     else
-        ac_policy.γ̂ += var_at_point(dsm, norm_last_x(oh))
+        ac_policy.γ̂ += only( var( finite_posterior(dsm, [norm_last_x(oh)])))
     end
     maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
         # possibly faster implementation when computing both at once
-        μ, σ² = mean_and_var_at_point(dsm, x)
+        μ, σ² = only.(mean_and_var(finite_posterior(dsm, [x])))
         return MutualInformation(μ, σ², ac_policy.sqrt_α, ac_policy.γ̂)
     end)
     return [maximizer]

@@ -54,7 +54,7 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::UpperConfidenceBoun
     dsm, oh)
     objective = x -> begin
         # possibly faster implementation when computing both at once
-        μ, σ² = mean_and_var_at_point(dsm, x)
+        μ, σ² = only.(mean_and_var(finite_posterior(dsm, [x])))
         return UpperConfidenceBound(μ, σ², ac_policy.scaling.βt)
     end
     maximizer, maximum = maximize_acquisition(objective,
@@ -73,7 +73,7 @@ function AbstractBayesianOptimization.next_batch!(ac_policy::UpperConfidenceBoun
     βt = sqrt(2 * log(nobs^(dimension(oh) / 2 + 2) * π^2 / (3 * ac_policy.scaling.δ)))
     maximizer = first(maximize_acquisition(dimension(oh), ac_policy.optimizer_options) do x
         # possibly faster implementation when computing both at once
-        μ, σ² = mean_and_var_at_point(dsm, x)
+        μ, σ² = only.(mean_and_var(finite_posterior(dsm, [x])))
         return UpperConfidenceBound(μ, σ², βt)
     end)
     return [maximizer]
