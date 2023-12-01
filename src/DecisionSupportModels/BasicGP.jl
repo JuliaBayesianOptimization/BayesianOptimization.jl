@@ -3,10 +3,10 @@ mutable struct BasicGPState
 end
 
 """
-TODO: add docs for "Pre decision support model", fix interface in AbstractBayesianOptimization
+TODO: add docs for "decision support model specification", fix interface definition
+ in AbstractBayesianOptimization
 """
-struct PreBasicGP{ H <: NamedTuple, J} <: AbstractDecisionSupportModel
-    oh::OptimizationHelper
+struct BasicGPSpecification{ H <: NamedTuple, J} <: AbstractDecisionSupportModel
     # number of initial samples
     n_init::Int
     # use kernel_creator for constructing surrogate at initialization
@@ -16,12 +16,12 @@ struct PreBasicGP{ H <: NamedTuple, J} <: AbstractDecisionSupportModel
     # in terms of number of objective evaluations
     optimize_θ_every::Int
     initializer::J
-    state::BasicGPState
     # todo verbosity levels
     verbose::Bool
 end
 
-function PreBasicGP(oh,
+function BasicGPSpecification(
+        oh,
         n_init;
         optimize_θ_every = 10,
         kernel_creator = kernel_creator,
@@ -34,13 +34,12 @@ function PreBasicGP(oh,
         # skip first 2^10 -1 samples
         skip(initializer, 10)
     end
-    return PreBasicGP(oh,
+    return BasicGPSpecification(
         n_init,
         kernel_creator,
         θ_initial,
         optimize_θ_every,
         initializer,
-        BasicGPState(false),
         verbose)
 end
 
@@ -50,58 +49,40 @@ needs to have a specified interval of valid values.
 
 We assume that the domain is `[0,1]^dim` and we are maximizing.
 """
-struct BasicGP{S <: GPSurrogate, H <: NamedTuple, J} <: AbstractDecisionSupportModel
+struct BasicGP{S <: GPSurrogate} <: AbstractDecisionSupportModel
     oh::OptimizationHelper
-    # number of initial samples
-    n_init::Int
-    # use kernel_creator for constructing surrogate at initialization
-    kernel_creator::Function
-    # for hyperparameter optimization
-    θ_initial::H
-    # in terms of number of objective evaluations
-    optimize_θ_every::Int
-    initializer::J
+    spec::BasicGPSpecification
     state::BasicGPState
     surrogate::S
-    # todo verbosity levels
-    verbose::Bool
 end
 
 # TODO: change interface in AbstractBayesianOptimization (and remove ! from initialize)
-function initialize(pre_dsm::PreBasicGP, oh)
+function initialize(dsm_spec::BasicGPSpecification, oh)
     # check if there is budget before evaluating the objective
-    if evaluation_budget(oh) < pre_dsm.n_init
+    if evaluation_budget(oh) < dsm_spec.n_init
         throw(ErrorException("Cannot initialize model, no evaluation budget left."))
     end
 
-    init_xs = [next!(pre_dsm.initializer) for _ in 1:(pre_dsm.n_init)]
+    init_xs = [next!(dsm_spec.initializer) for _ in 1:(dsm_spec.n_init)]
     init_ys = evaluate_objective!(oh, init_xs)
     # update of observed maximum & maximizer is done automatically by OptimizationHelper
 
     surrogate = GPSurrogate(init_xs,
         init_ys;
-        kernel_creator = pre_dsm.kernel_creator,
-        hyperparameters = ParameterHandling.value(pre_dsm.θ_initial))
-    update_hyperparameters!(surrogate, BoundedHyperparameters([pre_dsm.θ_initial]))
+        kernel_creator = dsm_spec.kernel_creator,
+        hyperparameters = ParameterHandling.value(dsm_spec.θ_initial))
+    update_hyperparameters!(surrogate, BoundedHyperparameters([dsm_spec.θ_initial]))
 
-    return BasicGP(pre_dsm.oh,
-        pre_dsm.n_init,
-        pre_dsm.kernel_creator,
-        pre_dsm.θ_initial,
-        pre_dsm.optimize_θ_every,
-        pre_dsm.initializer,
-        pre_dsm.state,
-        surrogate,
-        pre_dsm.verbose)
+    return BasicGP(oh, dsm_spec, BasicGPState(false), surrogate)
 end
 
 function AbstractBayesianOptimization.update!(dsm::BasicGP, oh, xs, ys)
-    dsm.verbose || @info @sprintf "#eval %3i: update! run" evaluation_counter(oh)
+    dsm.spec.verbose || @info @sprintf "#eval %3i: update! run" evaluation_counter(oh)
     @assert length(xs) == length(ys)
     add_points!(dsm.surrogate, xs, ys)
-    if evaluation_counter(oh) % dsm.optimize_θ_every == 0
-        update_hyperparameters!(dsm.surrogate, BoundedHyperparameters([dsm.θ_initial]))
-        dsm.verbose ||
+    if evaluation_counter(oh) % dsm.spec.optimize_θ_every == 0
+        update_hyperparameters!(dsm.surrogate, BoundedHyperparameters([dsm.spec.θ_initial]))
+        dsm.spec.verbose ||
             @info @sprintf "#eval %3i: hyperparmeter optimization run" evaluation_counter(oh)
     end
     # update of observed maximum & maximizer is done automatically by OptimizationHelper

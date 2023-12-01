@@ -64,7 +64,7 @@ end
 # g, sense::Sense, lb, ub, max_evaluations
 oh = OptimizationHelper(branin, Min, lb, ub, 200)
 # oh, n_init; optimize_θ_every = 10, ...
-pre_dsm = PreBasicGP(oh, 10; optimize_θ_every = 10)
+dsm_spec = BasicGPSpecification(oh, 10; optimize_θ_every = 10)
 policy = ExpectedImprovementPolicy(optimizer_options = (restarts = 50,))
 # policy = MaxMeanPolicy()
 
@@ -78,7 +78,7 @@ policy = ExpectedImprovementPolicy(optimizer_options = (restarts = 50,))
 #policy = UpperConfidenceBoundPolicy()
 
 # run initial sampling, create initial trust regions and local models
-dsm = initialize(pre_dsm, oh)
+dsm = initialize(dsm_spec, oh)
 
 # savefig(p(), "plot_before_optimization.png")
 # display(p())

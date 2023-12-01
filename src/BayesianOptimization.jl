@@ -19,7 +19,7 @@ using Random
 using SpecialFunctions
 
 # decision support model
-export PreBasicGP
+export BasicGPSpecification
 export BasicGP
 include("DecisionSupportModels/BasicGP.jl")
 
